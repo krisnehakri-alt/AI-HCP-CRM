@@ -1,4 +1,3 @@
-import React from 'react';
 import FormPanel from './components/FormPanel';
 import ChatPanel from './components/ChatPanel';
 

@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import type { RootState } from '../store';
 import { updateField, resetForm } from '../features/interactionSlice';
 import { setLoggedSuccess } from '../features/chatSlice';
-import { Mic, Search, Plus, CheckCircle2 } from 'lucide-react';
+import { Mic, Plus, CheckCircle2 } from 'lucide-react';
 import axios from 'axios';
 
 const FormPanel: React.FC = () => {
