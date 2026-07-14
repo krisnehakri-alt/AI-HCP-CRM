@@ -56,3 +56,6 @@ class ChatResponse(BaseModel):
     extracted_fields: dict
     logged: bool = False
     interaction_id: Optional[int] = None
+
+class VoiceNoteRequest(BaseModel):
+    raw_transcript: str

@@ -12,6 +12,7 @@ const FormPanel: React.FC = () => {
   const loggedSuccess = useSelector((state: RootState) => state.chat.loggedSuccess);
   const [hcps, setHcps] = useState<any[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSummarizing, setIsSummarizing] = useState(false);
 
   // Load HCPs for dropdown
   useEffect(() => {
@@ -47,6 +48,23 @@ const FormPanel: React.FC = () => {
       console.error(e);
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleSummarizeVoiceNote = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    const transcript = window.prompt("Paste or dictate your raw voice note transcript here:");
+    if (!transcript) return;
+    
+    setIsSummarizing(true);
+    try {
+      const res = await axios.post('http://localhost:8000/api/summarize', { raw_transcript: transcript });
+      dispatch(updateField({ field: 'topics_discussed', value: res.data.summary }));
+    } catch (err) {
+      console.error(err);
+      alert("Failed to summarize voice note. Please ensure the backend is running and the API key is valid.");
+    } finally {
+      setIsSummarizing(false);
     }
   };
 
@@ -118,9 +136,14 @@ const FormPanel: React.FC = () => {
         <div>
           <div className="flex justify-between items-center" style={{ marginBottom: '6px' }}>
             <label className="field-label" style={{ margin: 0 }}>Topics Discussed</label>
-            <button className="btn btn-secondary" style={{ fontSize: '12px', padding: '4px 8px' }}>
+            <button 
+              className="btn btn-secondary" 
+              style={{ fontSize: '12px', padding: '4px 8px' }}
+              onClick={handleSummarizeVoiceNote}
+              disabled={isSummarizing}
+            >
               <Mic size={14} />
-              Summarize from Voice Note
+              {isSummarizing ? 'Summarizing...' : 'Summarize from Voice Note'}
             </button>
           </div>
           <textarea name="topics_discussed" placeholder="Enter key topics discussed..." value={formState.topics_discussed} onChange={handleChange} />

@@ -55,6 +55,16 @@ def create_interaction(interaction: schemas.InteractionCreate, db: Session = Dep
 def list_interactions(db: Session = Depends(get_db)):
     return db.query(models.Interaction).order_by(models.Interaction.created_at.desc()).all()
 
+@app.post("/api/summarize")
+def summarize_note(request: schemas.VoiceNoteRequest):
+    from agent import summarize_voice_note
+    try:
+        # summarize_voice_note is a LangChain Tool, so we use .invoke()
+        result = summarize_voice_note.invoke({"raw_transcript": request.raw_transcript})
+        return {"summary": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.post("/api/chat", response_model=schemas.ChatResponse)
 async def chat_endpoint(request: schemas.ChatRequest, db: Session = Depends(get_db)):
     # Convert incoming dict messages to LangChain message objects
