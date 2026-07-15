@@ -121,6 +121,8 @@ async def chat_endpoint(request: schemas.ChatRequest, db: Session = Depends(get_
             interaction_id=interaction_id
         )
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":

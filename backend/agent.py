@@ -4,6 +4,7 @@ from typing import TypedDict, Annotated, Sequence, Any, Optional
 from langchain_core.messages import BaseMessage, HumanMessage, AIMessage, SystemMessage, ToolMessage
 from langchain_groq import ChatGroq
 from langgraph.graph import StateGraph, END
+from langgraph.graph.message import add_messages
 from langchain_core.tools import tool
 import sqlite3
 from dotenv import load_dotenv
@@ -103,7 +104,7 @@ tools = [search_hcp, summarize_voice_note, suggest_follow_ups, check_sample_comp
 tools_by_name = {tool.name: tool for tool in tools}
 
 class AgentState(TypedDict):
-    messages: Annotated[Sequence[BaseMessage], "The messages in the conversation"]
+    messages: Annotated[list[BaseMessage], add_messages]
     extracted_fields: dict
     ready_to_log: bool
 
