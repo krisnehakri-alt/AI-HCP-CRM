@@ -56,7 +56,7 @@ const FormPanel: React.FC = () => {
   const handleSummarizeVoiceNote = async (e: React.MouseEvent) => {
     e.preventDefault();
     const transcript = window.prompt("Paste or dictate your raw voice note transcript here:");
-    if (!transcript) return;
+    if (!transcript || !transcript.trim()) return;
     
     setIsSummarizing(true);
     try {

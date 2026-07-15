@@ -113,10 +113,12 @@ def parse_extracted_fields(messages: Sequence[BaseMessage]) -> dict:
     llm = ChatGroq(model="llama-3.1-8b-instant", temperature=0)
     
     # We create a specific prompt to extract JSON
-    sys_prompt = """Extract the current state of the interaction form fields from the conversation.
-    Return ONLY a JSON object with these keys (use null if not known):
-    hcp_name, interaction_type, date, time, attendees, topics_discussed, materials_shared, samples_distributed, sentiment, outcomes, follow_up_actions, ai_suggested_follow_ups.
-    Do not wrap in markdown blocks, just return raw JSON."""
+    sys_prompt = """Extract the current state of the interaction form fields based ONLY on factual data provided by the user about their HCP interaction.
+    CRITICAL RULES:
+    1. Do NOT extract AI clarifying questions, conversational filler, or error messages into ANY field (e.g. do NOT put "I don't see a transcript" into topics_discussed).
+    2. If a field is not explicitly supported by factual data in the conversation, set its value to null.
+    3. Return ONLY a JSON object with these exact keys: hcp_name, interaction_type, date, time, attendees, topics_discussed, materials_shared, samples_distributed, sentiment, outcomes, follow_up_actions, ai_suggested_follow_ups.
+    4. Do not wrap in markdown blocks, just return raw JSON."""
     
     # Only send a subset of history to avoid context limits if needed, but for this demo, full is ok
     conversation = "\n".join([f"{'User' if isinstance(m, HumanMessage) else 'Assistant'}: {m.content}" for m in messages if isinstance(m, (HumanMessage, AIMessage))])
