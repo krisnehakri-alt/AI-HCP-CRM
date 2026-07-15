@@ -38,7 +38,7 @@ def search_hcp(name: str) -> str:
 @tool
 def summarize_voice_note(raw_transcript: str) -> str:
     """Condenses a long/raw voice-note transcript into a concise 'Topics Discussed' note."""
-    llm = ChatGroq(model="gemma2-9b-it", temperature=0)
+    llm = ChatGroq(model="llama-3.1-8b-instant", temperature=0)
     prompt = f"Summarize the following voice note transcript into a concise, professional 'Topics Discussed' note for a CRM. Extract key points.\n\nTranscript: {raw_transcript}"
     response = llm.invoke([HumanMessage(content=prompt)])
     return response.content
@@ -47,7 +47,7 @@ def summarize_voice_note(raw_transcript: str) -> str:
 @tool
 def suggest_follow_ups(topics_discussed: str, sentiment: str, outcomes: str) -> str:
     """Proposes 2-4 follow-up actions based on sentiment and topics."""
-    llm = ChatGroq(model="gemma2-9b-it", temperature=0.7)
+    llm = ChatGroq(model="llama-3.1-8b-instant", temperature=0.7)
     prompt = f"Based on the following interaction details, suggest 2-4 actionable follow-ups for a pharma sales rep. Keep them brief and bulleted.\nTopics: {topics_discussed}\nSentiment: {sentiment}\nOutcomes: {outcomes}"
     response = llm.invoke([HumanMessage(content=prompt)])
     return response.content
@@ -56,7 +56,7 @@ def suggest_follow_ups(topics_discussed: str, sentiment: str, outcomes: str) -> 
 @tool
 def check_sample_compliance(materials_shared: str, samples_distributed: str) -> str:
     """Flags controlled materials or over-limit sample counts before logging."""
-    llm = ChatGroq(model="gemma2-9b-it", temperature=0)
+    llm = ChatGroq(model="llama-3.1-8b-instant", temperature=0)
     prompt = f"Act as a compliance checker. Review the following distributed items. Flag if more than 5 samples of any product are distributed, or if 'controlled' materials are shared without consent. If compliant, just return 'COMPLIANT'. Otherwise, list the compliance flags.\nMaterials: {materials_shared}\nSamples: {samples_distributed}"
     response = llm.invoke([HumanMessage(content=prompt)])
     return response.content
@@ -110,7 +110,7 @@ class AgentState(TypedDict):
 
 def parse_extracted_fields(messages: Sequence[BaseMessage]) -> dict:
     # Use LLM to extract the current state of fields based on the conversation history
-    llm = ChatGroq(model="gemma2-9b-it", temperature=0)
+    llm = ChatGroq(model="llama-3.1-8b-instant", temperature=0)
     
     # We create a specific prompt to extract JSON
     sys_prompt = """Extract the current state of the interaction form fields from the conversation.
@@ -146,7 +146,7 @@ def call_model(state: AgentState):
     messages = state['messages']
     extracted = state.get('extracted_fields', {})
     
-    model = os.getenv("PRIMARY_MODEL", "gemma2-9b-it")
+    model = os.getenv("PRIMARY_MODEL", "llama-3.1-8b-instant")
     # If a reasoning-heavy task is detected or configured, we could switch to llama-3.3-70b-versatile
     # For now we use the primary model.
     llm = ChatGroq(model=model, temperature=0).bind_tools(tools)
