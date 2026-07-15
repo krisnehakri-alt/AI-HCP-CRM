@@ -6,6 +6,8 @@ import { updateMultipleFields, resetForm } from '../features/interactionSlice';
 import { Send, User, Bot } from 'lucide-react';
 import axios from 'axios';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
 const ChatPanel: React.FC = () => {
   const dispatch = useDispatch();
   const { messages, isLoading } = useSelector((state: RootState) => state.chat);
@@ -37,7 +39,7 @@ const ChatPanel: React.FC = () => {
         current_fields: formState
       };
       
-      const res = await axios.post('http://localhost:8000/api/chat', payload);
+      const res = await axios.post(`${API_BASE_URL}/api/chat`, payload);
       
       // Update chat history
       dispatch(addMessage({ role: 'assistant', content: res.data.reply }));

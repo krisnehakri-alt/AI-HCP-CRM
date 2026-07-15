@@ -6,6 +6,8 @@ import { setLoggedSuccess } from '../features/chatSlice';
 import { Mic, Plus, CheckCircle2 } from 'lucide-react';
 import axios from 'axios';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
 const FormPanel: React.FC = () => {
   const dispatch = useDispatch();
   const formState = useSelector((state: RootState) => state.interaction);
@@ -18,7 +20,7 @@ const FormPanel: React.FC = () => {
   useEffect(() => {
     const fetchHcps = async () => {
       try {
-        const res = await axios.get('http://localhost:8000/api/hcps');
+        const res = await axios.get(`${API_BASE_URL}/api/hcps`);
         setHcps(res.data);
       } catch (e) {
         console.error("Failed to load HCPs");
@@ -38,7 +40,7 @@ const FormPanel: React.FC = () => {
   const handleLogInteraction = async () => {
     setIsSubmitting(true);
     try {
-      await axios.post('http://localhost:8000/api/interactions', formState);
+      await axios.post(`${API_BASE_URL}/api/interactions`, formState);
       dispatch(setLoggedSuccess(true));
       setTimeout(() => {
         dispatch(setLoggedSuccess(false));
@@ -58,7 +60,7 @@ const FormPanel: React.FC = () => {
     
     setIsSummarizing(true);
     try {
-      const res = await axios.post('http://localhost:8000/api/summarize', { raw_transcript: transcript });
+      const res = await axios.post(`${API_BASE_URL}/api/summarize`, { raw_transcript: transcript });
       dispatch(updateField({ field: 'topics_discussed', value: res.data.summary }));
     } catch (err) {
       console.error(err);
