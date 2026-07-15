@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import type { RootState } from '../store';
 import { updateField, resetForm } from '../features/interactionSlice';
 import { setLoggedSuccess } from '../features/chatSlice';
-import { Mic, Plus, CheckCircle2 } from 'lucide-react';
+import { Mic, Plus, CheckCircle2, X } from 'lucide-react';
 import axios from 'axios';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
@@ -15,6 +15,8 @@ const FormPanel: React.FC = () => {
   const [hcps, setHcps] = useState<any[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSummarizing, setIsSummarizing] = useState(false);
+  const [materialInput, setMaterialInput] = useState('');
+  const [sampleInput, setSampleInput] = useState('');
 
   // Load HCPs for dropdown
   useEffect(() => {
@@ -68,6 +70,36 @@ const FormPanel: React.FC = () => {
     } finally {
       setIsSummarizing(false);
     }
+  };
+
+  const handleAddMaterial = (e: React.MouseEvent | React.KeyboardEvent) => {
+    e.preventDefault();
+    if (!materialInput.trim()) return;
+    const current = formState.materials_shared;
+    const newVal = current ? `${current}, ${materialInput.trim()}` : materialInput.trim();
+    dispatch(updateField({ field: 'materials_shared', value: newVal }));
+    setMaterialInput('');
+  };
+
+  const handleRemoveMaterial = (indexToRemove: number) => {
+    const items = formState.materials_shared.split(',').map(i => i.trim()).filter(Boolean);
+    items.splice(indexToRemove, 1);
+    dispatch(updateField({ field: 'materials_shared', value: items.join(', ') }));
+  };
+
+  const handleAddSample = (e: React.MouseEvent | React.KeyboardEvent) => {
+    e.preventDefault();
+    if (!sampleInput.trim()) return;
+    const current = formState.samples_distributed;
+    const newVal = current ? `${current}, ${sampleInput.trim()}` : sampleInput.trim();
+    dispatch(updateField({ field: 'samples_distributed', value: newVal }));
+    setSampleInput('');
+  };
+
+  const handleRemoveSample = (indexToRemove: number) => {
+    const items = formState.samples_distributed.split(',').map(i => i.trim()).filter(Boolean);
+    items.splice(indexToRemove, 1);
+    dispatch(updateField({ field: 'samples_distributed', value: items.join(', ') }));
   };
 
   const SectionDivider = ({ title }: { title: string }) => (
@@ -155,16 +187,36 @@ const FormPanel: React.FC = () => {
           <div>
             <label className="field-label">Materials Shared</label>
             <div className="flex gap-2">
-              <input type="text" name="materials_shared" placeholder="Search materials..." value={formState.materials_shared} onChange={handleChange} />
-              <button className="btn-icon" style={{ border: '1px solid var(--border-subtle)' }}><Plus size={16}/></button>
+              <input type="text" placeholder="Search materials..." value={materialInput} onChange={(e) => setMaterialInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleAddMaterial(e)} />
+              <button type="button" className="btn-icon" onClick={handleAddMaterial} style={{ border: '1px solid var(--border-subtle)' }}><Plus size={16}/></button>
             </div>
+            {formState.materials_shared && (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '8px' }}>
+                {formState.materials_shared.split(',').map((item, idx) => item.trim() ? (
+                  <span key={idx} style={{ background: '#e2e8f0', color: '#334155', padding: '2px 8px', borderRadius: '12px', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    {item.trim()}
+                    <X size={12} style={{ cursor: 'pointer' }} onClick={() => handleRemoveMaterial(idx)} />
+                  </span>
+                ) : null)}
+              </div>
+            )}
           </div>
           <div>
             <label className="field-label">Samples Distributed</label>
             <div className="flex gap-2">
-              <input type="text" name="samples_distributed" placeholder="Add sample quantity..." value={formState.samples_distributed} onChange={handleChange} />
-              <button className="btn-icon" style={{ border: '1px solid var(--border-subtle)' }}><Plus size={16}/></button>
+              <input type="text" placeholder="Add sample quantity..." value={sampleInput} onChange={(e) => setSampleInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleAddSample(e)} />
+              <button type="button" className="btn-icon" onClick={handleAddSample} style={{ border: '1px solid var(--border-subtle)' }}><Plus size={16}/></button>
             </div>
+            {formState.samples_distributed && (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '8px' }}>
+                {formState.samples_distributed.split(',').map((item, idx) => item.trim() ? (
+                  <span key={idx} style={{ background: '#e2e8f0', color: '#334155', padding: '2px 8px', borderRadius: '12px', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    {item.trim()}
+                    <X size={12} style={{ cursor: 'pointer' }} onClick={() => handleRemoveSample(idx)} />
+                  </span>
+                ) : null)}
+              </div>
+            )}
           </div>
         </div>
 
